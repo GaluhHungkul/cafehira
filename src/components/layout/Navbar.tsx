@@ -57,7 +57,7 @@ export function Navbar() {
             className="btn-ghost p-2.5!"
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
           >
-            {theme === "light" ? (
+            {theme === "dark" ? (
               <Moon className="w-4 h-4" />
             ) : (
               <Sun className="w-4 h-4" />
