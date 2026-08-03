@@ -5,7 +5,7 @@ import { auth } from '@/lib/auth';
 export async function GET() {
   try {
     const session = await auth();
-    if (!session || (session.user as any).role !== 'ADMIN') {
+    if (!session || (session.user ).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -15,6 +15,7 @@ export async function GET() {
 
     return NextResponse.json(menuItems);
   } catch (error) {
+    console.log(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -22,7 +23,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session || (session.user as any).role !== 'ADMIN') {
+    if (!session || (session.user).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -41,6 +42,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(menuItem, { status: 201 });
   } catch (error ) {
-    return NextResponse.json({ error: error.message || 'Failed to create item' }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Failed to create item' }, { status: 500 });
   }
 }
