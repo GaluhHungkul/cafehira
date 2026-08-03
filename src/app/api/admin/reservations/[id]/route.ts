@@ -5,7 +5,7 @@ import { auth } from '@/lib/auth';
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   try {
     const session = await auth();
-    if (!session || (session.user as any).role !== 'ADMIN') {
+    if (!session || (session.user).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -19,6 +19,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
     return NextResponse.json(reservation);
   } catch (error) {
+    console.log(error)
     return NextResponse.json({ error: 'Failed to update reservation' }, { status: 500 });
   }
 }
@@ -26,7 +27,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
     const session = await auth();
-    if (!session || (session.user as any).role !== 'ADMIN') {
+    if (!session || (session.user).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -36,6 +37,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.log(error)
     return NextResponse.json({ error: 'Failed to delete reservation' }, { status: 500 });
   }
 }
