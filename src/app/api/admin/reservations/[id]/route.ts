@@ -29,7 +29,12 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  _: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+
+  const { id } = await params
   try {
     const session = await auth();
     if (!session || (session.user).role !== 'ADMIN') {
@@ -37,7 +42,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     }
 
     await prisma.reservation.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
