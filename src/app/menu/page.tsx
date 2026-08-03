@@ -2,25 +2,34 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { menuItems } from "@/lib/data";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Search, Coffee, Utensils, Star, IceCream } from "lucide-react";
 import Image from "next/image";
 import { fadeUp } from "@/lib/motion";
-
-const categories = ["All", ...Array.from(new Set(menuItems.map((item) => item.category)))];
+import { menuItems } from "@/lib/data";
 
 const categoryIcons: Record<string, React.ElementType> = {
   All: Utensils,
   Signature: Star,
   Coffee: Coffee,
   Dessert: IceCream,
+  Pastry: Coffee,
+  Matcha: Coffee,
+  Tea: Coffee
 };
 
 export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const categories = [
+    "All", 
+    ...Array.from(
+      new Set(
+        menuItems.map(m => m.category)
+      )
+    )
+  ]
 
   useEffect(() => {
     const debouncedSearchQuery = setTimeout(() => {
@@ -28,7 +37,7 @@ export default function MenuPage() {
     }, 500);
 
     return () => clearTimeout(debouncedSearchQuery);
-  },[searchQuery])
+  }, [searchQuery]);
 
   const filteredMenu = useMemo(() => {
     return menuItems.filter((item) => {
@@ -90,15 +99,15 @@ export default function MenuPage() {
 
         {/* Menu Grid */}
         <motion.div
-          layout
+          // layout
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          <AnimatePresence>
+          {/* <AnimatePresence> */}
             {filteredMenu.length > 0 ? (
               filteredMenu.map((item, index) => (
                 <motion.article
                   key={item.id}
-                  variants={fadeUp}
+                  // variants={fadeUp}
                   custom={index}
                   className="card-cafe group"
                 >
@@ -118,7 +127,7 @@ export default function MenuPage() {
                     <div className="flex items-start justify-between gap-4">
                       <h3 className="heading-card text-foreground">{item.name}</h3>
                       <span className="text-primary font-semibold whitespace-nowrap">
-                        {item.price}
+                        {`${item.price}`}
                       </span>
                     </div>
                     <p className="text-muted text-sm leading-relaxed">
@@ -148,7 +157,7 @@ export default function MenuPage() {
                 </button>
               </motion.div>
             )}
-          </AnimatePresence>
+          {/* </AnimatePresence> */}
         </motion.div>
       </div>
     </main>

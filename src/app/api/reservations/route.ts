@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       });
 
       return NextResponse.json({ success: true, reservation }, { status: 201 });
-    } catch (txError: any) {
+    } catch (txError ) {
       if (txError.message === 'SLOT_UNAVAILABLE') {
         return NextResponse.json({ error: 'The selected time slot is no longer available' }, { status: 409 });
       }

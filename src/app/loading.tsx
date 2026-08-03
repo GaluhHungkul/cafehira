@@ -8,7 +8,7 @@ export default function Loading() {
             <div key={i} className="skeleton h-4 w-16" />
           ))}
         </div>
-        <div className="skeleton h-9 w-24 rounded-full" />
+        <div className="h-9 w-24 rounded-full" />
       </div>
       <div className="flex-1 container-cafe py-24 grid lg:grid-cols-2 gap-16 items-center">
         <div className="flex flex-col gap-6">

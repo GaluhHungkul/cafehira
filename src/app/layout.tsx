@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Nunito, Montserrat, Poppins } from "next/font/google";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -46,12 +45,10 @@ export default function RootLayout({
       className={`${displayFont.variable} ${monoFont.variable} ${bodyFont.variable} scroll-smooth`}
       suppressHydrationWarning
     >
-      <body>
-        <ThemeProvider>
-          <Navbar />
-          {children}
-          <Footer />
-        </ThemeProvider>
+      <body className="dark">
+        <Navbar />
+        {children}
+        <Footer />
       </body>
     </html>
   );

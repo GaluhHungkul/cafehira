@@ -6,10 +6,33 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+}
+
 enum ReservationStatus {
   PENDING
   CONFIRMED
   CANCELLED
+}
+
+enum MenuCategory {
+  COFFEE
+  MATCHA
+  TEA
+  DESSERT
+  PASTRY
+  SIGNATURE
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Reservation {
@@ -24,4 +47,17 @@ model Reservation {
   status          ReservationStatus @default(PENDING)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+}
+
+model MenuItem {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  name        String
+  description String
+  category    MenuCategory
+  price       Decimal      @db.Decimal(10, 2)
+  image       String
+  isAvailable Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }

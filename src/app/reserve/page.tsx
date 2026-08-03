@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { CalendarDays, Clock, Users, MapPin, CheckCircle2, AlertCircle } from "lucide-react";
@@ -22,19 +22,28 @@ const reservationSchema = z.object({
 
 type ReservationFormValues = z.infer<typeof reservationSchema>;
 
-type Slot = {
-  time: string;
-  available: boolean;
-};
+const slots = [
+  { time: "09:00", available: true },
+  { time: "10:00", available: true },
+  { time: "11:00", available: false },
+  { time: "12:00", available: true },
+  { time: "13:00", available: false },
+  { time: "14:00", available: true },
+  { time: "15:00", available: true },
+  { time: "16:00", available: false },
+  { time: "17:00", available: true },
+  { time: "18:00", available: true },
+  { time: "19:00", available: false },
+  { time: "20:00", available: true },
+];
 
 export default function ReservationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   
-  const [slots, setSlots] = useState<Slot[] | null>(null);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-  const [slotsError, setSlotsError] = useState<string | null>(null);
+  const [isLoadingSlots] = useState(false);
+  const [slotsError] = useState<string | null>(null);
   const [confirmedData, setConfirmedData] = useState<ReservationFormValues | null>(null);
 
   const {
@@ -60,81 +69,86 @@ export default function ReservationPage() {
   const selectedDate = watch("reservationDate");
   const selectedTime = watch("reservationTime");
 
-  useEffect(() => {
-    if (!selectedDate) {
-      setSlots(null);
-      return;
-    }
+  // useEffect(() => {
+  //   if (!selectedDate) {
+  //     setSlots(null);
+  //     return;
+  //   }
 
-    let isMounted = true;
+  //   let isMounted = true;
     
-    // Clear selected time when date changes
-    setValue("reservationTime", "", { shouldValidate: !!selectedTime });
+  //   // Clear selected time when date changes
+  //   setValue("reservationTime", "", { shouldValidate: !!selectedTime });
     
-    const fetchSlots = async () => {
-      setIsLoadingSlots(true);
-      setSlotsError(null);
+  //   const fetchSlots = async () => {
+  //     setIsLoadingSlots(true);
+  //     setSlotsError(null);
       
-      try {
-        const res = await fetch(`/api/reservations/availability?date=${selectedDate}`);
-        const data = await res.json();
+  //     try {
+  //       const res = await fetch(`/api/reservations/availability?date=${selectedDate}`);
+  //       const data = await res.json();
         
-        if (!res.ok) {
-          throw new Error(data.error || "Failed to load availability");
-        }
-        if (isMounted) {
-          setSlots(data.slots);
-        }
-      } catch (err: any) {
-        if (isMounted) {
-          setSlotsError(err.message || "An error occurred");
-          setSlots(null);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingSlots(false);
-        }
-      }
-    };
+  //       if (!res.ok) {
+  //         throw new Error(data.error || "Failed to load availability");
+  //       }
+  //       if (isMounted) {
+  //         setSlots(data.slots);
+  //       }
+  //     } catch (err) {
+  //       if (isMounted) {
+  //         if(err instanceof Error){
+  //           setSlotsError(err?.message || "An error occurred");
+  //           setSlots(null);
+  //         }
+  //       }
+  //     } finally {
+  //       if (isMounted) {
+  //         setIsLoadingSlots(false);
+  //       }
+  //     }
+  //   };
 
-    fetchSlots();
+  //   fetchSlots();
     
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedDate, setValue]); // eslint-disable-line react-hooks/exhaustive-deps
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [selectedDate, setValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onSubmit = async (data: ReservationFormValues) => {
+  const onSubmit = async () => {
     setIsSubmitting(true);
     setSubmitError(null);
-    
-    try {
-      const res = await fetch("/api/reservations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      
-      const resData = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(resData.error || "Failed to make reservation");
-      }
-      
-      setConfirmedData(data);
-      setIsSuccess(true);
-    } catch (err: any) {
-      setSubmitError(err.message || "Something went wrong. Please try again.");
-    } finally {
+    setTimeout(() => {
       setIsSubmitting(false);
-    }
+      reset()
+    }, 1000);
+    // try {
+    //   const res = await fetch("/api/reservations", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(data),
+    //   });
+      
+    //   const resData = await res.json();
+      
+    //   if (!res.ok) {
+    //     throw new Error(resData.error || "Failed to make reservation");
+    //   }
+      
+    //   setConfirmedData(data);
+    //   setIsSuccess(true);
+    // } catch (err) {
+    //   if(err instanceof Error) setSubmitError(err.message || "Something went wrong. Please try again.");
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
   };
 
   const handleMakeAnother = () => {
     reset();
     setIsSuccess(false);
     setConfirmedData(null);
-    setSlots(null);
+    // setSlots(null);
   };
 
   if (isSuccess && confirmedData) {
@@ -275,7 +289,7 @@ export default function ReservationPage() {
                     id="reservationDate"
                     min={today}
                     {...register("reservationDate")}
-                    className={`w-full bg-surface-muted border ${errors.reservationDate ? 'border-red-400 focus:ring-red-400/20' : 'border-border focus:border-primary focus:ring-primary/20'} rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all text-foreground`}
+                    className={`w-full bg-primary border ${errors.reservationDate ? 'border-red-400 focus:ring-red-400/20' : 'border-border focus:border-primary focus:ring-primary/20'} rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all text-foreground`}
                   />
                   {errors.reservationDate && <p className="text-red-500 text-xs mt-1">{errors.reservationDate.message}</p>}
                 </div>

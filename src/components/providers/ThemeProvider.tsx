@@ -2,9 +2,9 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
-  useSyncExternalStore,
+  useEffect,
+  useState,
 } from "react";
 
 type Theme = "light" | "dark";
@@ -14,51 +14,49 @@ interface ThemeContextValue {
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-const listeners = new Set<() => void>();
+export function ThemeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [theme, setTheme] = useState<Theme>("light");
 
-function emitChange() {
-  listeners.forEach((listener) => listener());
-}
+  useEffect(() => {
+    const stored = localStorage.getItem("cafehira-theme") as Theme | null;
 
-function subscribe(onStoreChange: () => void) {
-  listeners.add(onStoreChange);
-  return () => listeners.delete(onStoreChange);
-}
+    const current =
+      stored ??
+      (window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light");
 
-function getTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
-  const stored = localStorage.getItem("cafehira-theme") as Theme | null;
-  if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
-function applyTheme(theme: Theme) {
-  localStorage.setItem("cafehira-theme", theme);
-  document.documentElement.classList.toggle("dark", theme === "dark");
-}
-
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const theme = useSyncExternalStore(subscribe, getTheme, () => "light");
-
-  const toggleTheme = useCallback(() => {
-    const next: Theme = getTheme() === "light" ? "dark" : "light";
-    applyTheme(next);
-    emitChange();
+    setTheme(current);
+    document.documentElement.classList.toggle("dark", current === "dark");
   }, []);
 
+  const toggleTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+
+    setTheme(next);
+    localStorage.setItem("cafehira-theme", next);
+    document.documentElement.classList.toggle("dark", next === "dark");
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme: theme as Theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
 }
 
 export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
-  return ctx;
+  const context = useContext(ThemeContext);
+
+  if (!context) {
+    throw new Error("useTheme must be used within ThemeProvider");
+  }
+
+  return context;
 }

@@ -5,12 +5,10 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, Moon, Sun, X } from "lucide-react";
 import { navLinks } from "@/lib/data";
-import { useTheme } from "@/components/providers/ThemeProvider";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -51,7 +49,7 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
-          <button
+          {/* <button
             type="button"
             onClick={toggleTheme}
             className="btn-ghost p-2.5!"
@@ -62,7 +60,7 @@ export function Navbar() {
             ) : (
               <Sun className="w-4 h-4" />
             )}
-          </button>
+          </button> */}
 
           {/* <Link href="/#reserve" className="btn-primary hidden sm:inline-flex">
             Reserve
