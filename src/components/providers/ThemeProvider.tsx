@@ -32,7 +32,7 @@ export function ThemeProvider({
         ? "dark"
         : "light");
 
-    setTheme(current);
+    // setTheme(current);
     document.documentElement.classList.toggle("dark", current === "dark");
   }, []);
 
