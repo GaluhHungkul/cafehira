@@ -1,3 +1,4 @@
+import { MenuCategory } from '@prisma/client'
 import prisma from '../src/lib/prisma'
 import * as bcrypt from 'bcrypt'
 
@@ -77,7 +78,7 @@ async function main() {
       create: {
         slug: item.slug,
         name: item.name,
-        category: item.category as any,
+        category: item.category as MenuCategory,
         description: item.description,
         price: item.price,
         image: item.image,
