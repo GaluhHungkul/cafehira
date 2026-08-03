@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+
+  const { id } = await params
+
   try {
     const session = await auth();
     if (!session || (session.user).role !== 'ADMIN') {
@@ -11,7 +17,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
     const body = await request.json();
     const menuItem = await prisma.menuItem.update({
-      where: { id: params.id },
+      where: { id },
       data: body,
     });
 
